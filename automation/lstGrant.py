@@ -177,7 +177,7 @@ def recur_distribute_unspend_tokens(
             )
             uncap_gauge["distribution"] = distribution
             uncap_gauge["pctDistribution"] = (
-                uncap_gauge["distribution"] / TOKENS_TO_FOLLOW_VOTING * 100
+                uncap_gauge["distribution"] / TOTAL_TOKENS_PER_EPOCH * 100
             )
     # Call recursively if there is still unspent tokens
     if (
