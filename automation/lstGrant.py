@@ -58,6 +58,10 @@ if not default_vote_cap == DESIRED_DEFAULT_VOTE_CAP:
     print(
         f"WARNING: Default vote cap was set to {DESIRED_DEFAULT_VOTE_CAP} but was overridden to {default_vote_cap} to ensure all tokens are distributed"
     )
+else:
+    print(
+        f"Default vote cap set to {DESIRED_DEFAULT_VOTE_CAP} which should be sufficient to distribute all tokens"
+    )
 
 
 def get_root_dir() -> str:
@@ -258,11 +262,11 @@ def run_stip_pipeline(end_date: int) -> None:
             and pool["gauge"]["isKilled"] is False
             and pool["id"].lower() in whitelist
         ):
-            _gauge_addr = Web3.to_checksum_address(pool["gauge"]["address"])
+            _gauge_addr = to_checksum_address(pool["gauge"]["address"])
             gauges[_gauge_addr] = {
-                "gaugeAddress": pool["gauge"]["address"],
-                "poolAddress": pool["address"],
-                "pool": pool["address"],
+                "gaugeAddress": to_checksum_address(pool["gauge"]["address"]),
+                "poolAddress": to_checksum_address(pool["address"]),
+                "pool": to_checksum_address(pool["address"]),
                 "symbol": pool["symbol"],
                 "id": pool["id"],
             }
@@ -339,14 +343,14 @@ def run_stip_pipeline(end_date: int) -> None:
     # Vote caps in percents are calculated as a percentage of the total amount of arb to distribute
     # Custom gauge caps taken from override data in constants.py, calculated as a percentage of the total amount of
     # arb to distribute
-    vote_cap_in_percents = {}
-    vote_caps = {}
+    percent_vote_caps_per_gauge = {}
+    max_tokens_per_gauge = {}
     for gauge_addr in gauges.keys():
-        vote_cap_in_percents[gauge_addr] = cap_override_data.get(
-            gauges[gauge_addr]["id"], default_vote_cap
+        percent_vote_caps_per_gauge[gauge_addr] = cap_override_data.get(
+            gauges[gauge_addr]["id"].lower(), default_vote_cap
         )
-        vote_caps[gauge_addr] = (
-            vote_cap_in_percents[gauge_addr] / 100 * TOTAL_TOKENS_PER_EPOCH
+        max_tokens_per_gauge[gauge_addr] = (
+            percent_vote_caps_per_gauge[gauge_addr] / 100 * TOTAL_TOKENS_PER_EPOCH
         )
     # Calculate total weight
     total_weight = sum([gauge["voteWeight"] for gauge in gauges.values()])
@@ -362,8 +366,8 @@ def run_stip_pipeline(end_date: int) -> None:
         # Cap distribution
         to_distribute = (
             to_distribute
-            if to_distribute < vote_caps[gauge_addr]
-            else vote_caps[gauge_addr]
+            if to_distribute < max_tokens_per_gauge[gauge_addr]
+            else max_tokens_per_gauge[gauge_addr]
         )
         # Get L2 gauge addr
 
@@ -378,16 +382,16 @@ def run_stip_pipeline(end_date: int) -> None:
             "voteWeight": gauge_data["voteWeight"],
             "voteWeightNoBoost": gauge_data["weightNoBoost"],
             "distribution": to_distribute
-            if to_distribute < vote_caps[gauge_addr]
-            else vote_caps[gauge_addr],
+            if to_distribute < max_tokens_per_gauge[gauge_addr]
+            else max_tokens_per_gauge[gauge_addr],
             "pctDistribution": to_distribute / TOTAL_TOKENS_PER_EPOCH * 100,
             "boost": combined_boost.get(gauge_addr, 1),
             "staticBoost": boost_data.get(gauge_addr, 1),
             "dynamicBoost": dynamic_boosts.get(gauge_addr, 1),
-            "cap": f"{cap_override_data.get(gauge_addr, default_vote_cap)}",
+            "cap": f"{percent_vote_caps_per_gauge[gauge_addr]}%",
             "fixedIncentive": fixed_emissions_per_pool[gauge_data["id"]],
         }
-    recur_distribute_unspend_tokens(vote_caps, gauge_distributions)
+    recur_distribute_unspend_tokens(max_tokens_per_gauge, gauge_distributions)
     print(
         f"Unspent arb: {TOTAL_TOKENS_PER_EPOCH - sum([gauge['distribution'] for gauge in gauge_distributions.values()])}"
     )
