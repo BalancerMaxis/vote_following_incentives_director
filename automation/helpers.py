@@ -17,7 +17,9 @@ from web3.exceptions import BadFunctionCallOutput
 
 BAL_GQL_URL = "https://api-v3.balancer.fi/"
 
-BLOCKS_GQL_URL_ARB = "https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-one-blocks"
+BLOCKS_GQL_URL_ARB = (
+    "https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-one-blocks"
+)
 
 BLOCKS_BY_CHAIN = {
     "mainnet": "https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks",
@@ -164,12 +166,13 @@ def get_balancer_pool_snapshots(block: int, graph_url: str) -> Optional[List[Dic
     offset = 0
     while True:
         result = client.execute(
-            gql(POOLS_SNAPSHOTS_QUERY.format(first=limit, skip=offset, block=block)))
-        all_pools.extend(result['poolSnapshots'])
+            gql(POOLS_SNAPSHOTS_QUERY.format(first=limit, skip=offset, block=block))
+        )
+        all_pools.extend(result["poolSnapshots"])
         offset += limit
         if offset >= 5000:
             break
-        if len(result['poolSnapshots']) < limit - 1:
+        if len(result["poolSnapshots"]) < limit - 1:
             break
     return all_pools
 
@@ -186,7 +189,7 @@ def fetch_all_pools_info(chain: str) -> List[Dict]:
     client = Client(transport=transport, fetch_schema_from_transport=True)
     query = gql(BAL_GET_VOTING_LIST_QUERY)
     result = client.execute(query)
-    return result['veBalGetVotingList']
+    return result["veBalGetVotingList"]
 
 
 def _get_balancer_pool_tokens_balances(
@@ -203,9 +206,9 @@ def _get_balancer_pool_tokens_balances(
     )
 
     # Get all tokens in the pool and their balances
-    tokens, balances, _ = balancer_vault.functions.getPoolTokens(
-        balancer_pool_id
-    ).call(block_identifier=block_number)
+    tokens, balances, _ = balancer_vault.functions.getPoolTokens(balancer_pool_id).call(
+        block_identifier=block_number
+    )
     token_balances = []
     for index, token in enumerate(tokens):
         token_contract = web3.eth.contract(
@@ -288,14 +291,17 @@ def get_twap_bpt_price(
         total_supply = Decimal(
             weighed_pool_contract.functions.totalSupply().call(
                 block_identifier=block_number
-            ) / 10 ** decimals
+            )
+            / 10**decimals
         )
     except BadFunctionCallOutput:
         print("Pool wasn't created at the block number")
         return None
     balances = _get_balancer_pool_tokens_balances(
-        balancer_pool_id=balancer_pool_id, web3=web3, chain=chain,
-        block_number=block_number or web3.eth.block_number
+        balancer_pool_id=balancer_pool_id,
+        web3=web3,
+        chain=chain,
+        block_number=block_number or web3.eth.block_number,
     )
     # Now let's calculate price with twap
     for balance in balances:
@@ -320,9 +326,9 @@ def calculate_aura_vebal_share(web3: Web3, block_number: int) -> Decimal:
     total_supply = ve_bal_contract.functions.totalSupply().call(
         block_identifier=block_number
     )
-    aura_vebal_balance = ve_bal_contract.functions.balanceOf(
-        AURA_VEBAL_HOLDER
-    ).call(block_identifier=block_number)
+    aura_vebal_balance = ve_bal_contract.functions.balanceOf(AURA_VEBAL_HOLDER).call(
+        block_identifier=block_number
+    )
     return Decimal(aura_vebal_balance) / Decimal(total_supply)
 
 
@@ -350,9 +356,7 @@ def get_block_by_ts(timestamp: int, chain: str) -> int:
 
 
 if __name__ == "__main__":
-    web3 = Web3(
-        Web3.HTTPProvider("https://rpc.gnosischain.com")
-    )
+    web3 = Web3(Web3.HTTPProvider("https://rpc.gnosischain.com"))
     bpt_price = get_twap_bpt_price(
         "0xbad20c15a773bf03ab973302f61fabcea5101f0a000000000000000000000034",
         "gnosis",
