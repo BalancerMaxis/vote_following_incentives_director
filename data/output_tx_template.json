@@ -6,7 +6,7 @@
     "name": "Transactions Batch",
     "description": "",
     "txBuilderVersion": "1.16.1",
-    "createdFromSafeAddress": "0xb6BfF54589f269E248f99D5956f1fDD5b014D50e",
+    "createdFromSafeAddress": "0x2a185C8A3C63d7bFe63aD5d950244FFe9d0a4b60",
     "createdFromOwnerAddress": "",
     "checksum": "0x60b02488a85be3a01e98bf20b0a502aa807f462e6f59a740ec3d602a56a716ae"
   },
@@ -23,7 +23,7 @@
       "contractInputsValues": null
     },
     {
-      "to": "0xF23d8342881eDECcED51EA694AC21C2B68440929",
+      "to": "0x34a265e1EBCb31586293eb2D2f94c6ff2f920340",
       "value": "0",
       "data": null,
       "contractMethod": {
@@ -54,7 +54,7 @@
       }
     },
     {
-      "to": "0x912CE59144191C1204E64559FE8253a0e49E6548",
+      "to": "0x4200000000000000000000000000000000000042",
       "value": "0",
       "data": null,
       "contractMethod": {
@@ -74,7 +74,7 @@
         "payable": false
       },
       "contractInputsValues": {
-        "to": "0xF23d8342881eDECcED51EA694AC21C2B68440929",
+        "to": "0x34a265e1EBCb31586293eb2D2f94c6ff2f920340",
         "amount": "80000000000000000000000"
       }
     }
