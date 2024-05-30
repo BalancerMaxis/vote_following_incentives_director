@@ -34,6 +34,7 @@ ACTIVE_POOLS_AND_OVERRIDES = [
     {
         "pool_id": "0x4fd63966879300cafafbb35d157dc5229278ed2300020000000000000000002b",
         "meta": "rocket fuel",
+        "fixedEmissions": 1_500,
     },
     {
         "pool_id": "0x7ca75bdea9dede97f8b13c6641b768650cb837820002000000000000000000d5",

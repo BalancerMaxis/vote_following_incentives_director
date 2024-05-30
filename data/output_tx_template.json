@@ -12,17 +12,6 @@
   },
   "transactions": [
     {
-      "to": "0x2CDE9919e81b20B4B33DD562a48a84b54C48F00C",
-      "value": "0",
-      "data": null,
-      "contractMethod": {
-        "inputs": [],
-        "name": "redeemAllPlans",
-        "payable": false
-      },
-      "contractInputsValues": null
-    },
-    {
       "to": "0x34a265e1EBCb31586293eb2D2f94c6ff2f920340",
       "value": "0",
       "data": null,
@@ -75,7 +64,7 @@
       },
       "contractInputsValues": {
         "to": "0x34a265e1EBCb31586293eb2D2f94c6ff2f920340",
-        "amount": "80000000000000000000000"
+        "amount": ""
       }
     }
   ]

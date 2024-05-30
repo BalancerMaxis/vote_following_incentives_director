@@ -327,7 +327,7 @@ def run_stip_pipeline(end_date: int) -> None:
         dynamic_boosts[gauge_addr] = dynamic_boost
 
         # Now calculate the final boost value, which uses formula - (dynamic boost + fixed boost) - 1
-        boost = (dynamic_boost + boost_data.get(gauge_addr, 1)) - 1
+        boost = (dynamic_boost + boost_data.get(gauge_data["id"], 1)) - 1
         combined_boost[gauge_addr] = boost
         weight *= boost
         vote_weights[gauge_addr] = weight
@@ -386,7 +386,7 @@ def run_stip_pipeline(end_date: int) -> None:
             else max_tokens_per_gauge[gauge_addr],
             "pctDistribution": to_distribute / TOTAL_TOKENS_PER_EPOCH * 100,
             "boost": combined_boost.get(gauge_addr, 1),
-            "staticBoost": boost_data.get(gauge_addr, 1),
+            "staticBoost": boost_data.get(gauges[gauge_addr]["id"], 1),
             "dynamicBoost": dynamic_boosts.get(gauge_addr, 1),
             "cap": f"{percent_vote_caps_per_gauge[gauge_addr]}%",
             "fixedIncentive": fixed_emissions_per_pool[gauge_data["id"]],
