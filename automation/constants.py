@@ -4,9 +4,9 @@ OUTPUT_FILE_PREFIX = "beets_lst_lrt"
 CHAIN_NAME = "optimism"
 CURRENT_YEAR = 2024
 # How many incentives should be taken away from vote following to be distributed as fixed incentives?  Per 2 week epoch
-FIXED_INCENTIVE_TOKENS_PER_EPOCH = 3_000
+FIXED_INCENTIVE_TOKENS_PER_EPOCH = 1_500
 # Total number of tokens available per 2 week epoch
-TOTAL_TOKENS_PER_EPOCH = 50_000
+TOTAL_TOKENS_PER_EPOCH = 7_520
 DYNAMIC_BOOST_CAP = 3
 MIN_BAL_IN_USD_FOR_BOOST = 200
 TOKENS_TO_FOLLOW_VOTING = TOTAL_TOKENS_PER_EPOCH - FIXED_INCENTIVE_TOKENS_PER_EPOCH
@@ -33,7 +33,7 @@ BALANCER_GAUGE_CONTROLLER_ABI = [
     },
 ]
 
-## TODO at some point snapshot queries should be moved to bal_tools  also lstGrant.py to think about.
+# TODO at some point snapshot queries should be moved to bal_tools  also lstGrant.py to think about.
 # Query to fetch pool snapshots
 POOLS_SNAPSHOTS_QUERY = """
 {{
