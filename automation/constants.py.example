@@ -1,6 +1,9 @@
 from web3 import Web3
 
-OUTPUT_FILE_PREFIX = "beets_lst_lrt"
+# There should be a pool_config file named $FILE_PREFIX.py in the automation directory that holds the running pool config
+# Outputs will also use this prefix
+FILE_PREFIX = "example_op_config"
+
 CHAIN_NAME = "optimism"
 CURRENT_YEAR = 2024
 # How many incentives should be taken away from vote following to be distributed as fixed incentives?  Per 2 week epoch
@@ -11,7 +14,6 @@ DYNAMIC_BOOST_CAP = 3
 MIN_BAL_IN_USD_FOR_BOOST = 200
 TOKENS_TO_FOLLOW_VOTING = TOTAL_TOKENS_PER_EPOCH - FIXED_INCENTIVE_TOKENS_PER_EPOCH
 DESIRED_DEFAULT_VOTE_CAP = 30
-
 
 BALANCER_GAUGE_CONTROLLER_ABI = [
     {
