@@ -15,6 +15,7 @@ from gql import gql
 from gql.transport.requests import RequestsHTTPTransport
 from pycoingecko import CoinGeckoAPI
 from web3 import Web3
+import importlib
 
 from automation.constants import TOTAL_TOKENS_PER_EPOCH
 from automation.constants import TOKENS_TO_FOLLOW_VOTING
@@ -24,16 +25,19 @@ from automation.constants import DYNAMIC_BOOST_CAP
 from automation.constants import MIN_BAL_IN_USD_FOR_BOOST
 from automation.constants import POOLS_SNAPSHOTS_QUERY
 from automation.constants import DESIRED_DEFAULT_VOTE_CAP
-from automation.constants import OUTPUT_FILE_PREFIX
+from automation.constants import FILE_PREFIX
 from automation.emissions_per_year import (
     get_emissions_per_week,
 )
 from automation.helpers import fetch_all_pools_info
 from automation.helpers import get_abi
 from automation.helpers import get_block_by_ts
-from automation.pool_config import boost_data
-from automation.pool_config import cap_override_data
-from automation.pool_config import fixed_emissions_per_pool
+
+# import boost_data, cap_override_data and fixed_emissions_per_pool from the python file specified in POOL_CONFIG
+pool_config = importlib.import_module(f"automation.{FILE_PREFIX}")
+boost_data = pool_config.boost_data
+cap_override_data = pool_config.cap_override_data
+fixed_emissions_per_pool = pool_config.fixed_emissions_per_pool
 from bal_addresses import AddrBook
 from bal_tools import Subgraph
 from bal_addresses import to_checksum_address
@@ -224,7 +228,7 @@ def generate_and_save_transaction(
 
     # Dump back to tokens_distribution_for_msig.json
     with open(
-        f"{get_root_dir()}/output/{OUTPUT_FILE_PREFIX}_{start_date.date()}_{end_date.date()}.json",
+        f"{get_root_dir()}/output/{FILE_PREFIX}_{start_date.date()}_{end_date.date()}.json",
         "w",
     ) as _f:
         json.dump(output_data, _f, indent=4)
@@ -416,7 +420,7 @@ def run_stip_pipeline(end_date: int) -> None:
     )
     # Export to csv
     gauge_distributions_df.to_csv(
-        f"{get_root_dir()}/output/{OUTPUT_FILE_PREFIX}_{start_date.date()}_{end_date.date()}.csv",
+        f"{get_root_dir()}/output/{FILE_PREFIX}_{start_date.date()}_{end_date.date()}.csv",
         index=False,
     )
 
