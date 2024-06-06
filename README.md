@@ -98,4 +98,4 @@ _Pass ARB for the token, 0x912ce59144191c1204e64559fe8253a0e49e6548, follow the 
 
 The CSV [here](output/arbitrum_stip_bridge_start_q2_2024_2024-05-17_2024-05-31.csv) shows the output of the model for the pools on Arbitrum using past data. The amounts distributed are for a 2 week epoch.  The outputs are based on the current core pools list, and the parameters defined above.  The whitelist, and parameters above are subject to change.
 
-![img.png](img.png)
+![img.png](images/exampleOutputsImage.png)
