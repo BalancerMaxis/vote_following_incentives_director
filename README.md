@@ -80,7 +80,7 @@ This capability should be used sparingly, and primarily to direct incentives tow
 
 Balancer will be distributing $ARB via direct payments on the Balancer Gauge.  In order to keep accounting clear, and based on the way the gauge functions, it would be quite difficult to add other streams of STIP to this process.  As a result, we recommend the following 2 methods for distributing $ARB to Balancer pools during STIP.
 
-- You can place a vote incentive on one of the Arbitrum Incentive markets: [HiddenHand](https://hiddenhand.finance/aura), [Paladin](https://quest.paladin.vote/#/create).  
+- You can place a vote incentive on one of the Arbitrum Incentive markets: [HiddenHand](https://hiddenhand.finance/aura), [Paladin](https://quest.paladin.vote/#/create), [Vote Market](https://votemarket.stakedao.org/?market=bal).  
   - This will trigger voting, which will trigger BAL and AURA emissions as well as create more signaling for $ARB flows from this program.
 
 - You can pay direct incentives into Aura, which will stream with no fees taken to depositors.
