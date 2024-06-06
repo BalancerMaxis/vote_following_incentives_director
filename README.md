@@ -7,7 +7,7 @@ $ARB to a pool is boosted by a dynamic boost (described below based on fees vs e
 
 The pools participating in the program, as well as configuration around overriding caps and fixed boost can be found [here](https://github.com/BalancerMaxis/arbitrum_grants_distributor/blob/main/automation/arbitrum_stip_bridge_start_q2_2024.py#L29).
 
-Pools which are at least 50% interest bearing (LST) are elidable for whitelist addition.
+Pools which are at least 50% interest bearing (LST) are eligible for whitelist addition.
 
 ---
 
