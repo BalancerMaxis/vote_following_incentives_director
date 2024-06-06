@@ -1,19 +1,57 @@
-# For a base/default test run:
+## Arbitrum Grants Distributor  - STIP-Bridge
+Distribution program pays out 50,000 ARB per week for 12 weeks based on veBAL voting for whitelisted pools on Arbitrum
+
+Pools are capped at 20% of the total weekly $ARB by default.
+
+$ARB to a pool is boosted by a dynamic boost (described below based on fees vs emissions), and a fixed boost that can be assigned by Balancer BD to support special initiatives.
+
+The pools pariticipaing in the program, as well as configuration around overriding caps and fixed boost can be found [here](https://github.com/BalancerMaxis/arbitrum_grants_distributor/blob/main/automation/arbitrum_stip_bridge_start_q2_2024.py#L29)
+---
+
+## Configuration and Data
+- [Emissions per year config](https://github.com/BalancerMaxis/arbitrum_grants_distributor/blob/main/automation/emissions_per_year.py)
+- [ARB amounts emitted](https://github.com/BalancerMaxis/arbitrum_grants_distributor/blob/main/automation/constants.py#L12)
+- [Output Data](https://github.com/BalancerMaxis/STIP_automation/tree/main/output) is collected in output/ directory
+
+---
+
+## How boost is calculated
+
+Boost is based on 2 factors.
+
+1. A fixed boost granted to incentive important initiatives
+2. A variable boost based on the efficiency of the pool (fees/emissions)
+
+### Fixed boost
+By default, all pools have a fixed boost of 1.  Here are some examples of situatuions where fixed boost might be assigned and what it could be:
+
+| Desired Outcome/Activity                               | Fixed Boost |
+|--------------------------------------------------------|-------------|
+| 100% Intrest Bearing                                   | 1.5x        |
+| IB token Mintable on Arbitrum                          | 1.75x       |
+| Short term boost for a shared/major marketing campaign | 2x          |
+
+#### 100% Intrest Bearing    
+- 100% of the liqudity in this pool is interest bearing
+- Get this by pairing your token with something like wstETH, sDAI, or sFRAX (or another partner LST)
+- 
+#### IB Token Mintable on Arbitrum
+- To encourage a more native LST environemnt on Arbitrum.  We are open to considering and granting boost to projects that enable native minting/burning of their LST on Arbi.
+
+#### Short term boost for a shared/major marketing campaign
+- Sometimes the best way to grow a pool is fast, with lots of incentives and marketing push.
+- In cases where it's all comming together like that and we have a partner looking to also hit it hard, we may consider a short term but high boost or some fixed incentives to help kick things off.
 
 
-### Copy constants.py.example to constants.py.
-Make sure you copy/not rename so your config file isn't part of changes to the mother branch of your fork.
+### Variable Fee Based Boost (1-3x)
+The variable boost is determined by using the following formula:
 
-### Take a quick look at example_op_config.py, which is actvated based on FILE_PREFIX in constants.py
-These 2 files are how you control stuff, assuming not too much has changed, the current config should be good enough to do something.
+`Variable Boost = min(Fees Earned / (USD Value of BAL emitted + 1), 3)`
 
-### Go back to the root of the repo and run
-```bash
-pip3 install -r requirements.txt
-python main.py
-```
+The variable boosted is capped at 3 and has a minimum of 1.  
 
-### Check test results in the outputs folder
-There's some example outputs there already.
+The fee based boost is added to the fixed boost, so:
 
-To run for real, you want to follow a pattern similar to that described in `.github/workflows/main.yml`, passing in some arguments to main.
+Total Boost = **_Fixed Boost + Variable Boost - 1_** 
+
+where both boosts are >=1 it will be automatically computed by the model and applied. 
