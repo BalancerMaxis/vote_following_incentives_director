@@ -47,10 +47,12 @@ ACTIVE_POOLS_AND_OVERRIDES = [
     {
         "pool_id": "0x2d6ced12420a9af5a83765a8c48be2afcd1a8feb000000000000000000000500",
         "meta": {"symbol": "cbETH/rETH/wstETH"},
+        "fixedBoost": 1.5,
     },
     {
         "pool_id": "0x3fd4954a851ead144c2ff72b1f5a38ea5976bd54000000000000000000000480",
         "meta": {"symbol": "ankrETH/wstETH-BPT"},
+        "fixedBoost": 1.5,
     },
     {
         "pool_id": "0x451b0afd69ace11ec0ac339033d54d2543b088a80000000000000000000004d5",
@@ -63,10 +65,12 @@ ACTIVE_POOLS_AND_OVERRIDES = [
     {
         "pool_id": "0xb61371ab661b1acec81c699854d2f911070c059e000000000000000000000516",
         "meta": {"symbol": "ezETH/wstETH"},
+        "fixedBoost": 1.5,
     },
     {
         "pool_id": "0xc2598280bfea1fe18dfcabd21c7165c40c6859d30000000000000000000004f3",
         "meta": {"symbol": "wstETH/sfrxETH"},
+        "fixedBoost": 1.5,
     },
     {
         "pool_id": "0xd0ec47c54ca5e20aaae4616c25c825c7f48d40690000000000000000000004ef",
@@ -75,14 +79,6 @@ ACTIVE_POOLS_AND_OVERRIDES = [
     {
         "pool_id": "0xef0c116a2818a5b1a5d836a291856a321f43c2fb00020000000000000000053a",
         "meta": {"symbol": "ECLP-WOETH-WETH"},
-    },
-    {
-        "pool_id": "0x423a1323c871abc9d89eb06855bf5347048fc4a5000000000000000000000496",
-        "meta": {"symbol": "4POOL"},
-    },
-    {
-        "pool_id": "0x32df62dc3aed2cd6224193052ce665dc181658410002000000000000000003bd",
-        "meta": {"symbol": "RDNT-WETH"},
     },
     {
         "pool_id": "0x9f8ed1acfe0c863381b9081aff2144fc867aa7730002000000000000000004d4",

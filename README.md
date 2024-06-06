@@ -5,7 +5,7 @@ Pools are capped at 20% of the total weekly $ARB by default.
 
 $ARB to a pool is boosted by a dynamic boost (described below based on fees vs emissions), and a fixed boost that can be assigned by Balancer BD to support special initiatives.
 
-The pools participating in the program, as well as configuration around overriding caps and fixed boost can be found here.
+The pools participating in the program, as well as configuration around overriding caps and fixed boost can be found [here](https://github.com/BalancerMaxis/arbitrum_grants_distributor/blob/main/automation/arbitrum_stip_bridge_start_q2_2024.py#L29).
 
 Pools which are at least 50% interest bearing or deemed as strategic liquidity are eligible for whitelist addition.
 
@@ -41,16 +41,16 @@ Note that these values are not meant to be cumulative.  The highest one to apply
 
 #### 100% Intrest Bearing    
 - 100% of the liqudity in this pool is interest bearing
-  - Get this by pairing your Intrest Bearing Token with other yield yield bearing token such as wstETH, sDAI, or sFRAX, etc. 
+  - Get this by pairing your Intrest Bearing Token with other yield bearing tokens such as wstETH, sDAI, or sFRAX, etc. 
   - Does not apply to weighted pools.  Intended for CL based approaches such as Stableswaps and Gyro. 
 
 #### IB Token Mintable on Arbitrum
 - To encourage a more native yield environment on Arbitrum, we are open to considering and granting boost to projects that enable native minting/burning of their yield bearing asset on Arbi.  
-  - In general we would expect these pools to have at least 50% of the tokens in the pool mintable on Arbitrum.
+  - In general, we would expect these pools to have at least 50% of the tokens in the pool mintable on Arbitrum.
   
 #### Short term boost for a shared/major marketing campaign
 - Sometimes the best way to grow a pool is fast, with lots of incentives and marketing push.
-- In cases where it's all coming together like that and we have a partner looking to also hit it hard, we may consider a short term but high boost or some fixed incentives to help kick things off.
+  - In cases where it's all coming together like that, and we have a partner looking to also hit it hard, we may consider a short term but high boost or some fixed incentives to help kick things off.
 
 
 ### Variable Fee Based Boost (1-3x)
@@ -94,6 +94,8 @@ _Pass ARB for the token, 0x912ce59144191c1204e64559fe8253a0e49e6548, follow the 
 
 **Get in contact with Aura or Balancer BD or the Balancer Maxis (can find us on discord) if you need help figuring this out.**
 
+## Example outputs
 
+The CSV [here](output/arbitrum_stip_bridge_start_q2_2024_2024-05-17_2024-05-31.csv) shows the output of the model for the pools on Arbitrum using past data. The amounts distributed are for a 2 week epoch.  The outputs are based on the current core pools list, and the parameters defined above.  The whitelist, and parameters above are subject to change.
 
-
+![img.png](img.png)
