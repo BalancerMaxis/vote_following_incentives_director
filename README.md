@@ -1,20 +1,18 @@
-## Arbitrum Aidrop distribution program
+## Arbitrum Grants Distributor  - STIP-Bridge
+Distribution program pays out 50,000 ARB per week for 12 weeks based on veBAL voting for whitelisted pools on Arbitrum
 
-Distribution program pays out 100k ARB per week based on veBAL voting for pools on Arbitrum.
+Pools are capped at 20% of the total weekly $ARB by default.
 
-Some pools have a boost factor, then ARB is distributed to all pools based on their relative boosted weight.
+$ARB to a pool is boosted by a dynamic boost (described below based on fees vs emissions), and a fixed boost that can be assigned by Balancer BD to support special initiatives.
 
-Pools are capped at 10% of the total weekly $ARB, except for ETH based LSD stableswap pools which are capped at 20%
-
-Boosts and caps are defined per gauge in [arbitrumGrantGaugeMetadata.json](https://github.com/BalancerMaxis/data_automation/blob/main/data/arbitrumGrantGuageMetadata.json)
-
+The pools pariticipaing in the program, as well as configuration around overriding caps and fixed boost can be found [here](https://github.com/BalancerMaxis/arbitrum_grants_distributor/blob/main/automation/arbitrum_stip_bridge_start_q2_2024.py#L29)
 ---
 
 ## Configuration and Data
-- [Emissions per year config](https://github.com/BalancerMaxis/STIP_automation/blob/main/automation/emissions_per_year.py)
-- [Static Boost Info](https://github.com/BalancerMaxis/STIP_automation/blob/main/automation/static_boosts.py)
-- [ARB amounts emitted](https://github.com/BalancerMaxis/STIP_automation/blob/main/automation/constants.py#L58)
-- [Output Data](https://github.com/BalancerMaxis/STIP_automation/tree/main/output) is collected in output/ directory
+- [ARB amounts emitted](https://github.com/BalancerMaxis/arbitrum_grants_distributor/blob/main/automation/constants.py#L12)
+- [Pool Whitelist and Modifiers](https://github.com/BalancerMaxis/arbitrum_grants_distributor/blob/main/automation/arbitrum_stip_bridge_start_q2_2024.py)
+- [Output Data](https://github.com/BalancerMaxis/arbitrum_grants_distributor/tree/main/output) is collected in output/ directory
+- [BAL Emissions per year](https://github.com/BalancerMaxis/arbitrum_grants_distributor/blob/main/automation/emissions_per_year.py)
 
 ---
 
@@ -26,35 +24,32 @@ Boost is based on 2 factors.
 2. A variable boost based on the efficiency of the pool (fees/emissions)
 
 ### Fixed boost
-By default, all pools have a fixed boost of 1.  The following table describes situations that receive a higher fixed boost:
+By default, all pools have a fixed boost of 1.  Here are some examples of situatuions where fixed boost might be assigned and what it could be:
 
-| Desired Outcome/Activity | Fixed Boost |
-|--------------------------|-------------|
-| Ecosystem Integration    | 1.5x        |
-| Core Infrastructure      | 1.75x       |
-| New and Novel AMM tech   | 2x          |
+| Desired Outcome/Activity                               | Fixed Boost |
+|--------------------------------------------------------|-------------|
+| 100% Intrest Bearing                                   | 1.5x        |
+| IB token Mintable on Arbitrum                          | 1.75x       |
+| Short term boost for a shared/major marketing campaign | 2x          |
 
-#### Ecosystem Integrations (1.5x)
-- Core pools that receive bribes from fees based on governance and with at least 1 million dollars in TVL.
-- Yield splitting protocols (such as Pendle) will have extra ARB allocated to the supported pools that have TVL >$1m
-- Concentrated liquidity pool types by Gyroscope 
-- FXPool https://docs.xave.co/product-overview-1/amm Pools meant to facilitate low slippage trades for assets the trade at a known exchange rate
-- Balancer LP Tokens (BPT) with significant TVL as collateral on lending markets 
+#### 100% Intrest Bearing    
+- 100% of the liqudity in this pool is interest bearing
+- Get this by pairing your token with something like wstETH, sDAI, or sFRAX (or another partner LST)
+- 
+#### IB Token Mintable on Arbitrum
+- To encourage a more native LST environemnt on Arbitrum.  We are open to considering and granting boost to projects that enable native minting/burning of their LST on Arbi.
 
-#### Core Infra (1.75x)
-- LSTs
-- 80/20 based governance/incentive systems.
+#### Short term boost for a shared/major marketing campaign
+- Sometimes the best way to grow a pool is fast, with lots of incentives and marketing push.
+- In cases where it's all comming together like that and we have a partner looking to also hit it hard, we may consider a short term but high boost or some fixed incentives to help kick things off.
 
-#### New and Novel AMM tech (2x)
-This is to help get attention to new Custom Pool types that have just launched.  
-Pools in this section may move to the "Integrations" category after some time.
 
 ### Variable Fee Based Boost (1-3x)
 The variable boost is determined by using the following formula:
 
-Variable Boost = ** (Fees Earned * 3) / (USD Value of BAL emitted + 1)**
+`Variable Boost = min(Fees Earned / (USD Value of BAL emitted + 1), 3)`
 
-The variable boosted is capped at 3 and has a minimum of 1.
+The variable boosted is capped at 3 and has a minimum of 1.  
 
 The fee based boost is added to the fixed boost, so:
 
