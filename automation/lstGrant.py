@@ -33,6 +33,8 @@ from automation.helpers import fetch_all_pools_info
 from automation.helpers import get_abi
 from automation.helpers import get_block_by_ts
 
+from .aura_direct import generate_and_save_aura_transaction
+
 # import boost_data, cap_override_data and fixed_emissions_per_pool from the python file specified in POOL_CONFIG
 pool_config = importlib.import_module(f"automation.{FILE_PREFIX}")
 boost_data = pool_config.boost_data
@@ -220,7 +222,7 @@ def generate_and_save_transaction(
             ] = f"[{','.join([str(int(Decimal(gauge['distribution']) * Decimal(1e18) / 2)) for gauge in gauge_distributions])}]"
             tx["contractInputsValues"][
                 "maxPeriods"
-            ] = f"[{','.join(['2' for gauge in gauge_distributions])}]"
+            ] = f"[{','.join(['1' for gauge in gauge_distributions])}]"  ## todo 1 was changed to 2 for aura split
         if tx["contractMethod"]["name"] == "transfer":
             tx["contractInputsValues"]["amount"] = str(
                 int(Decimal(TOKENS_TO_FOLLOW_VOTING) * Decimal(1e18))
@@ -430,3 +432,9 @@ def run_stip_pipeline(end_date: int) -> None:
     )
 
     generate_and_save_transaction(gauge_distributions, start_date, end_date)
+    # TODO
+    # Note that this will also be for the full amount logic to split is pending, but can run for half to split the whole
+    #  payload.
+    generate_and_save_aura_transaction(
+        gauge_distributions, start_date, end_date, CHAIN_NAME
+    )
