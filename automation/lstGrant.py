@@ -326,8 +326,13 @@ def run_stip_pipeline(end_date: int) -> None:
                 pool_protocol_fees.get(gauge_addr, 0) / dollar_value_of_bal_emitted,
                 DYNAMIC_BOOST_CAP,
             )
+            print(
+                f"Gauge {gauge_addr} has a fees of {pool_protocol_fees.get(gauge_addr, 0)} and earned {dollar_value_of_bal_emitted} in USD BAL rendering a raw dynamic boost of {dynamic_boost}"
+            )
         else:
-            dynamic_boost = 0
+            dynamic_boost = 1.0
+        if dynamic_boost < 1:
+            dynamic_boost = 1.0
         dynamic_boosts[gauge_addr] = dynamic_boost
 
         # Now calculate the final boost value, which uses formula - (dynamic boost + fixed boost) - 1
