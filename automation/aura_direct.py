@@ -34,12 +34,17 @@ def generate_and_save_aura_transaction(
     # Inject list of gauges addresses:
     ## TODO for special week redeuced from 1 period to 2 and divided amount over 2 for aurasplit
     for gauge in gauge_distributions:
-        aura_pid = aura.aura_pids_by_address[gauge["recipientGaugeAddr"]]
+        aura_pid = aura.aura_pids_by_address.get(gauge["recipientGaugeAddr"])
+        if not aura_pid:
+            print(
+                f"WARNING: No aura pid found for gauge {gauge['recipientGaugeAddr']}, using gauge address in payload instead for easy debugging."
+            )
+            aura_pid = gauge["recipientGaugeAddr"]
         tx = copy.deepcopy(tx_template)
         tx["contractInputsValues"]["_pid"] = aura_pid
         amount = Decimal(gauge["distribution"]) * Decimal(1e18)
         amount = amount.to_integral_value(rounding=ROUND_DOWN)
-        tx["contractInputsValues"]["_amount"] = str(amount) / 2
+        tx["contractInputsValues"]["_amount"] = str(int(amount / 2))
         tx["contractInputsValues"][
             "_periods"
         ] = "1"  ## 2 weeks TODO was chagned to 1 for aura split
