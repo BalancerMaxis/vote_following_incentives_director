@@ -98,8 +98,6 @@ ACTIVE_POOLS_AND_OVERRIDES = [
 ]
 
 
-
-
 # assert that the total sum of all fixedEmissions is equal to FIXED_INCENTIVE_TOKENS_PER_EPOCH
 total_fixed_emissions = sum(
     [x.get("fixedEmissions", 0) for x in ACTIVE_POOLS_AND_OVERRIDES]
