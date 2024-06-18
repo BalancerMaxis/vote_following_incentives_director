@@ -33,7 +33,8 @@ from automation.helpers import fetch_all_pools_info
 from automation.helpers import get_abi
 from automation.helpers import get_block_by_ts
 
-from .aura_direct import generate_and_save_aura_transaction
+from .payload_builders import generate_and_save_aura_transaction
+from .payload_builders import generate_and_save_bal_injector_transaction
 
 # import boost_data, cap_override_data and fixed_emissions_per_pool from the python file specified in POOL_CONFIG
 pool_config = importlib.import_module(f"automation.{FILE_PREFIX}")
@@ -196,45 +197,6 @@ def recur_distribute_unspend_tokens(
         > 0
     ):
         recur_distribute_unspend_tokens(max_tokens_per_pool, tokens_gauge_distributions)
-
-
-def generate_and_save_transaction(
-    tokens_gauge_distributions: Dict, start_date: datetime, end_date: datetime
-) -> Dict:
-    """
-    Take tx template and inject data into it
-    """
-    # Dump into output.json using:
-    with open(f"{get_root_dir()}/data/output_tx_template.json") as f:
-        output_data = json.load(f)
-    # Find transaction with func name `setRecipientList` and dump gauge
-    gauge_distributions = tokens_gauge_distributions.values()
-    for tx in output_data["transactions"]:
-        if tx["contractMethod"]["name"] == "setRecipientList":
-            # Inject list of gauges addresses:
-            tx["contractInputsValues"][
-                "gaugeAddresses"
-            ] = f"[{','.join([gauge['recipientGaugeAddr'] for gauge in gauge_distributions])}]"
-            # Inject vote weights:
-            # Dividing by 2 since we are distributing for 2 weeks and 1 week is a period
-            tx["contractInputsValues"][
-                "amountsPerPeriod"
-            ] = f"[{','.join([str(int(Decimal(gauge['distribution']) * Decimal(1e18) / 2)) for gauge in gauge_distributions])}]"
-            tx["contractInputsValues"][
-                "maxPeriods"
-            ] = f"[{','.join(['1' for gauge in gauge_distributions])}]"  ## todo 1 was changed to 2 for aura split
-        if tx["contractMethod"]["name"] == "transfer":
-            tx["contractInputsValues"]["amount"] = str(
-                int(Decimal(TOKENS_TO_FOLLOW_VOTING) * Decimal(1e18))
-            )
-
-    # Dump back to tokens_distribution_for_msig.json
-    with open(
-        f"{get_root_dir()}/output/{FILE_PREFIX}_{start_date.date()}_{end_date.date()}.json",
-        "w",
-    ) as _f:
-        json.dump(output_data, _f, indent=4)
-    return output_data
 
 
 def run_stip_pipeline(end_date: int) -> None:
@@ -431,10 +393,21 @@ def run_stip_pipeline(end_date: int) -> None:
         index=False,
     )
 
-    generate_and_save_transaction(gauge_distributions, start_date, end_date)
+    generate_and_save_bal_injector_transaction(
+        gauge_distributions,
+        start_date,
+        end_date,
+        pct_of_distribution=0.25,  # 50% due to 1 week, 50% due to half aura
+        num_periods=1,  # 1 week special
+    )
     # TODO
     # Note that this will also be for the full amount logic to split is pending, but can run for half to split the whole
     #  payload.
     generate_and_save_aura_transaction(
-        gauge_distributions, start_date, end_date, CHAIN_NAME
+        gauge_distributions,
+        start_date,
+        end_date,
+        CHAIN_NAME,
+        pct_of_distribution=0.25,  # 50% due to 1 week, 50% due to half BAL
+        num_periods=1,  # 1 week special
     )
