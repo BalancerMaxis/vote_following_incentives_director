@@ -35,7 +35,6 @@ def generate_and_save_aura_transaction(
     # Find transaction with func name `setRecipientList` and dump gauge
     gauge_distributions = tokens_gauge_distributions.values()
     tx_template = output_data["transactions"][1]
-
     tx_list = []
     total_amount = 0
     # Inject list of gauges addresses:
@@ -90,7 +89,9 @@ def generate_and_save_bal_injector_transaction(
 
     # Find transaction with func name `setRecipientList` and dump gauge
     gauge_distributions = tokens_gauge_distributions.values()
-    tx_template = output_data["transactions"][0]
+    claim_tx = output_data["transactions"][0]
+    tx_template = output_data["transactions"][1]
+    transfer_tx = output_data["transactions"][2]
     tx_list = []
     gauges_list = []
     amounts_list = []
@@ -112,9 +113,10 @@ def generate_and_save_bal_injector_transaction(
     tx["contractInputsValues"]["amountsPerPeriod"] = f"[{','.join(amounts_list)}]"
     tx["contractInputsValues"]["maxPeriods"] = f"[{','.join(max_periods_list)}]"
     tx_list.append(tx)
-    transfer_tx = output_data["transactions"][1]
+
     transfer_tx["contractInputsValues"]["amount"] = str(int(total_amount))
     tx_list.append(transfer_tx)
+    tx_list.insert(0, claim_tx)
     output_data["transactions"] = tx_list
     with open(
         f"{get_root_dir()}/output/{FILE_PREFIX}_{start_date.date()}_{end_date.date()}_bal_injector_stream.json",
