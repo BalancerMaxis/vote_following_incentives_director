@@ -2,6 +2,7 @@ from web3 import Web3
 from automation.constants import (
     FIXED_INCENTIVE_TOKENS_PER_EPOCH,
     DESIRED_DEFAULT_VOTE_CAP,
+    DEFAULT_PCT_TO_AURA,
 )
 
 #####
@@ -9,6 +10,7 @@ from automation.constants import (
 #####
 # Default cap was set to 10% when this comment was written, will be used if not overridden. (see constants.py)
 # Default fixedBoost is 1 if not specified
+# Default pctToAura is 0 if not specified
 # Default fixexEmissions is 0 if not specified
 # All fixedEmissions should equal up to under constants.py/FIXED_INCENTIVE_TOKENS_PER_EPOCH
 
@@ -21,6 +23,7 @@ from automation.constants import (
 #         "fixedBoost": 1.5,
 #         "capOverride": 20,
 #         "fixedEmissions": 3_000,
+#         "percent_to_aura": 0, #set to 0.5 to send 50% to aura direct
 #     },
 
 #  THIS CONFIG IS FOR ARBITRUM CHAIN - includes all current core pools with no modifiers
@@ -112,9 +115,13 @@ assert (
 boost_data = {}
 cap_override_data = {}
 fixed_emissions_per_pool = {}
+percent_to_aura = {}
 # Load static boost here
 for pooldata in ACTIVE_POOLS_AND_OVERRIDES:
     pool_id_lower = pooldata["pool_id"].lower()
+    percent_to_aura[pool_id_lower] = pooldata.get(
+        "percent_to_aura", DEFAULT_PCT_TO_AURA
+    )
     boost_data[pool_id_lower] = pooldata.get("fixedBoost", 1)
     cap_override_data[pool_id_lower] = pooldata.get(
         "capOverride", DESIRED_DEFAULT_VOTE_CAP

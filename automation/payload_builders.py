@@ -49,7 +49,7 @@ def generate_and_save_aura_transaction(
         tx = copy.deepcopy(tx_template)
         tx["contractInputsValues"]["_pid"] = aura_pid
         amount = (
-            Decimal(gauge["distribution"]) * Decimal(pct_of_distribution)
+            Decimal(gauge["distroToAura"]) * Decimal(pct_of_distribution)
         ).quantize(precision, rounding=ROUND_DOWN)
         wei_amount = amount * Decimal(1e18)
         tx["contractInputsValues"]["_amount"] = str(wei_amount)
@@ -97,7 +97,7 @@ def generate_and_save_bal_injector_transaction(
     for gauge in gauge_distributions:
         gauges_list += gauge["recipientGaugeAddr"]
         epoch_amount = (
-            Decimal(gauge["distribution"]) * Decimal(pct_of_distribution)
+            Decimal(gauge["distroToBalancer"]) * Decimal(pct_of_distribution)
         ).quantize(precision, rounding=ROUND_DOWN)
         period_amount = epoch_amount / Decimal(num_periods)
         wei_amount = period_amount * Decimal(1e18)

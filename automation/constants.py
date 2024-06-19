@@ -14,7 +14,7 @@ DYNAMIC_BOOST_CAP = 3
 MIN_BAL_IN_USD_FOR_BOOST = 200
 TOKENS_TO_FOLLOW_VOTING = TOTAL_TOKENS_PER_EPOCH - FIXED_INCENTIVE_TOKENS_PER_EPOCH
 DESIRED_DEFAULT_VOTE_CAP = 20
-
+DEFAULT_PCT_TO_AURA = 0.5  ## This should be 0 in most cases, but everything is starting in the first round so use global 50%
 BALANCER_GAUGE_CONTROLLER_ABI = [
     {
         "stateMutability": "view",

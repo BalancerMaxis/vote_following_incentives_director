@@ -41,6 +41,7 @@ pool_config = importlib.import_module(f"automation.{FILE_PREFIX}")
 boost_data = pool_config.boost_data
 cap_override_data = pool_config.cap_override_data
 fixed_emissions_per_pool = pool_config.fixed_emissions_per_pool
+percent_to_aura_per_pool = pool_config.percent_to_aura
 from bal_addresses import AddrBook
 from bal_tools import Subgraph
 from bal_addresses import to_checksum_address
@@ -197,6 +198,11 @@ def recur_distribute_unspend_tokens(
         > 0
     ):
         recur_distribute_unspend_tokens(max_tokens_per_pool, tokens_gauge_distributions)
+    else:
+        # to finish recalculate aura and bal split
+        for gauge in tokens_gauge_distributions.values():
+            gauge["distroToAura"] = gauge["distribution"] * gauge["pctToAura"]
+            gauge["distroToBalancer"] = gauge["distribution"] * (1 - gauge["pctToAura"])
 
 
 def run_stip_pipeline(end_date: int) -> None:
@@ -348,19 +354,23 @@ def run_stip_pipeline(end_date: int) -> None:
         mainnet_root_gauge_contract = web3_mainnet.eth.contract(
             address=Web3.to_checksum_address(gauge_addr), abi=get_abi("ArbRootGauge")
         )
+        to_distribute = min(to_distribute, max_tokens_per_gauge[gauge_addr])
+        pct_to_aura = percent_to_aura_per_pool.get(gauges[gauge_addr]["id"], 0)
+        pct_to_bal = 1 - pct_to_aura
         gauge_distributions[gauge_addr] = {
             "recipientGaugeAddr": mainnet_root_gauge_contract.functions.getRecipient().call(),
             "poolAddress": gauge_data["poolAddress"],
             "symbol": gauge_data["symbol"],
-            "voteWeight": gauge_data["voteWeight"],
-            "voteWeightNoBoost": gauge_data["weightNoBoost"],
-            "distribution": to_distribute
-            if to_distribute < max_tokens_per_gauge[gauge_addr]
-            else max_tokens_per_gauge[gauge_addr],
+            "distribution": to_distribute,
             "pctDistribution": to_distribute / TOTAL_TOKENS_PER_EPOCH * 100,
-            "boost": combined_boost.get(gauge_addr, 1),
+            "pctToAura": pct_to_aura,
+            "distroToAura": to_distribute * pct_to_aura,
+            "distroToBalancer": to_distribute * pct_to_bal,
+            "voteWeightNoBoost": gauge_data["weightNoBoost"],
             "staticBoost": boost_data.get(gauges[gauge_addr]["id"], 1),
             "dynamicBoost": dynamic_boosts.get(gauge_addr, 1),
+            "boost": combined_boost.get(gauge_addr, 1),
+            "voteWeight": gauge_data["voteWeight"],
             "cap": f"{percent_vote_caps_per_gauge[gauge_addr]}%",
             "fixedIncentive": fixed_emissions_per_pool[gauge_data["id"]],
         }
@@ -397,7 +407,7 @@ def run_stip_pipeline(end_date: int) -> None:
         gauge_distributions,
         start_date,
         end_date,
-        pct_of_distribution=0.25,  # 50% due to 1 week, 50% due to half aura
+        pct_of_distribution=0.5,  # 50% due to 1 week
         num_periods=1,  # 1 week special
     )
     # TODO
@@ -408,6 +418,6 @@ def run_stip_pipeline(end_date: int) -> None:
         start_date,
         end_date,
         CHAIN_NAME,
-        pct_of_distribution=0.25,  # 50% due to 1 week, 50% due to half BAL
+        pct_of_distribution=0.5,  # 50% due to 1 week
         num_periods=1,  # 1 week special
     )
