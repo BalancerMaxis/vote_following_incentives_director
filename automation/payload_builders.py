@@ -51,15 +51,18 @@ def generate_and_save_aura_transaction(
         amount = (
             Decimal(gauge["distroToAura"]) * Decimal(pct_of_distribution)
         ).quantize(precision, rounding=ROUND_DOWN)
-        wei_amount = amount * Decimal(1e18)
+        wei_amount = (amount * Decimal(1e18)).to_integral_value()
         tx["contractInputsValues"]["_amount"] = str(wei_amount)
         tx["contractInputsValues"]["_periods"] = str(num_periods)
-        tx_list.append(tx)
-        total_amount += wei_amount
-
+        if wei_amount > 0:
+            tx_list.append(tx)
+            total_amount += wei_amount
+    if not tx_list:
+        print("No distributions to send to aura direct")
+        return
     # Add approve tx
     approve_tx = output_data["transactions"][0]
-    approve_tx["contractInputsValues"]["amount"] = str(total_amount * Decimal(1e18))
+    approve_tx["contractInputsValues"]["amount"] = str(total_amount)
     tx_list.insert(0, approve_tx)
     output_data["transactions"] = tx_list
     with open(
@@ -95,13 +98,13 @@ def generate_and_save_bal_injector_transaction(
     total_amount = 0
     # Inject list of gauges addresses:
     for gauge in gauge_distributions:
-        gauges_list += gauge["recipientGaugeAddr"]
+        gauges_list.append(gauge["recipientGaugeAddr"])
         epoch_amount = (
             Decimal(gauge["distroToBalancer"]) * Decimal(pct_of_distribution)
         ).quantize(precision, rounding=ROUND_DOWN)
         period_amount = epoch_amount / Decimal(num_periods)
-        wei_amount = period_amount * Decimal(1e18)
-        total_amount += epoch_amount * Decimal(1e18)
+        wei_amount = (period_amount * Decimal(1e18)).to_integral_value()
+        total_amount += (epoch_amount * Decimal(1e18)).to_integral_value()
         amounts_list.append(str(wei_amount))
         max_periods_list.append(str(num_periods))
     tx = copy.deepcopy(tx_template)
@@ -118,5 +121,5 @@ def generate_and_save_bal_injector_transaction(
         "w",
     ) as _f:
         json.dump(output_data, _f, indent=2)
-    print(f"{total_amount} $ARB approved for balancer injector")
+    print(f"{total_amount} $ARB transferred for balancer injector")
     return output_data
