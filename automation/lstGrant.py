@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 from collections import defaultdict
@@ -403,7 +404,7 @@ def run_stip_pipeline(end_date: int) -> None:
         index=False,
     )
 
-    generate_and_save_bal_injector_transaction(
+    bal_tx = generate_and_save_bal_injector_transaction(
         gauge_distributions,
         start_date,
         end_date,
@@ -413,7 +414,7 @@ def run_stip_pipeline(end_date: int) -> None:
     # TODO
     # Note that this will also be for the full amount logic to split is pending, but can run for half to split the whole
     #  payload.
-    generate_and_save_aura_transaction(
+    aura_tx = generate_and_save_aura_transaction(
         gauge_distributions,
         start_date,
         end_date,
@@ -421,3 +422,12 @@ def run_stip_pipeline(end_date: int) -> None:
         pct_of_distribution=0.5,  # 50% due to 1 week
         num_periods=1,  # 1 week special
     )
+    # Create a merged transaction file for single load
+    merged_tx = copy.deepcopy(bal_tx)
+    if len(aura_tx["transactions"]) > 1:
+        merged_tx["transactions"].extend(aura_tx["transactions"])
+        with open(
+            f"{get_root_dir()}/output/{FILE_PREFIX}_{start_date.date()}_{end_date.date()}_merged.json",
+            "w",
+        ) as f:
+            json.dump(merged_tx, f)
