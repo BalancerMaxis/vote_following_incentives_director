@@ -430,4 +430,4 @@ def run_stip_pipeline(end_date: int) -> None:
             f"{get_root_dir()}/output/{FILE_PREFIX}_{start_date.date()}_{end_date.date()}_merged.json",
             "w",
         ) as f:
-            json.dump(merged_tx, f)
+            json.dump(merged_tx, f, indent=2)
