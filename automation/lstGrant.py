@@ -422,9 +422,9 @@ def run_stip_pipeline(end_date: int) -> None:
         pct_of_distribution=0.5,  # 50% due to 1 week
         num_periods=1,  # 1 week special
     )
-    # Create a merged transaction file for single load
-    merged_tx = copy.deepcopy(bal_tx)
-    if len(aura_tx["transactions"]) > 1:
+    if isinstance(aura_tx, dict) and aura_tx.get(["transactions"], 0) > 1:
+        # Create a merged transaction file for single load
+        merged_tx = copy.deepcopy(bal_tx)
         merged_tx["transactions"].extend(aura_tx["transactions"])
         with open(
             f"{get_root_dir()}/output/{FILE_PREFIX}_{start_date.date()}_{end_date.date()}_merged.json",
