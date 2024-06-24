@@ -59,10 +59,11 @@ def generate_and_save_aura_transaction(
     if not tx_list:
         print("No distributions to send to aura direct")
         return
-    # Add approve tx
-    approve_tx = output_data["transactions"][0]
-    approve_tx["contractInputsValues"]["amount"] = str(total_amount)
-    tx_list.insert(0, approve_tx)
+    if total_amount > 0:
+        # Add approve tx
+        approve_tx = output_data["transactions"][0]
+        approve_tx["contractInputsValues"]["amount"] = str(total_amount)
+        tx_list.insert(0, approve_tx)
     output_data["transactions"] = tx_list
     with open(
         f"{get_root_dir()}/output/{FILE_PREFIX}_{start_date.date()}_{end_date.date()}_aura_direct_stream.json",
