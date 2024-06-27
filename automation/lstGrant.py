@@ -405,29 +405,26 @@ def run_stip_pipeline(end_date: int) -> None:
     )
 
     bal_tx = generate_and_save_bal_injector_transaction(
-        gauge_distributions,
-        start_date,
-        end_date,
-        pct_of_distribution=0.5,  # 50% due to 1 week
-        num_periods=1,  # 1 week special
+        gauge_distributions, start_date, end_date
     )
-    # TODO
+    # Aura direct was not used in this program
     # Note that this will also be for the full amount logic to split is pending, but can run for half to split the whole
     #  payload.
-    aura_tx = generate_and_save_aura_transaction(
-        gauge_distributions,
-        start_date,
-        end_date,
-        CHAIN_NAME,
-        pct_of_distribution=0.5,  # 50% due to 1 week
-        num_periods=1,  # 1 week special
-    )
-    if isinstance(aura_tx, dict) and aura_tx.get(["transactions"], 0) > 1:
-        # Create a merged transaction file for single load
-        merged_tx = copy.deepcopy(bal_tx)
-        merged_tx["transactions"].extend(aura_tx["transactions"])
-        with open(
-            f"{get_root_dir()}/output/{FILE_PREFIX}_{start_date.date()}_{end_date.date()}_merged.json",
-            "w",
-        ) as f:
-            json.dump(merged_tx, f, indent=2)
+    # aura_tx = generate_and_save_aura_transaction(
+    #    gauge_distributions,
+    #    start_date,
+    #    end_date,
+    #    CHAIN_NAME,
+    #    pct_of_distribution=0.5,  # 50% due to 1 week
+    #    num_periods=1,  # 1 week special
+    # )
+    # if isinstance(aura_tx, dict) and aura_tx.get(["transactions"], 0) > 1:
+    #    # Create a merged transaction file for single load
+    #    merged_tx = copy.deepcopy(bal_tx)
+    #    merged_tx["transactions"].extend(aura_tx["transactions"])
+    #    with open(
+    #        f"{get_root_dir()}/output/{FILE_PREFIX}_{start_date.date()}_{end_date.date()}_merged.json",
+    #        "w",
+    #    ) as f:
+    #        json.dump(merged_tx, f, indent=2)
+    #
