@@ -33,6 +33,8 @@ from automation.helpers import fetch_all_pools_info
 from automation.helpers import get_abi
 from automation.helpers import get_block_by_ts
 
+from .payload_builders import generate_and_save_bal_injector_transaction
+
 # import boost_data, cap_override_data and fixed_emissions_per_pool from the python file specified in POOL_CONFIG
 pool_config = importlib.import_module(f"automation.{FILE_PREFIX}")
 boost_data = pool_config.boost_data
@@ -196,45 +198,6 @@ def recur_distribute_unspend_tokens(
         recur_distribute_unspend_tokens(max_tokens_per_pool, tokens_gauge_distributions)
 
 
-def generate_and_save_transaction(
-    tokens_gauge_distributions: Dict, start_date: datetime, end_date: datetime
-) -> Dict:
-    """
-    Take tx template and inject data into it
-    """
-    # Dump into output.json using:
-    with open(f"{get_root_dir()}/data/output_tx_template.json") as f:
-        output_data = json.load(f)
-    # Find transaction with func name `setRecipientList` and dump gauge
-    gauge_distributions = tokens_gauge_distributions.values()
-    for tx in output_data["transactions"]:
-        if tx["contractMethod"]["name"] == "setRecipientList":
-            # Inject list of gauges addresses:
-            tx["contractInputsValues"][
-                "gaugeAddresses"
-            ] = f"[{','.join([gauge['recipientGaugeAddr'] for gauge in gauge_distributions])}]"
-            # Inject vote weights:
-            # Dividing by 2 since we are distributing for 2 weeks and 1 week is a period
-            tx["contractInputsValues"][
-                "amountsPerPeriod"
-            ] = f"[{','.join([str(int(Decimal(gauge['distribution']) * Decimal(1e18) / 2)) for gauge in gauge_distributions])}]"
-            tx["contractInputsValues"][
-                "maxPeriods"
-            ] = f"[{','.join(['2' for gauge in gauge_distributions])}]"
-        if tx["contractMethod"]["name"] == "transfer":
-            tx["contractInputsValues"]["amount"] = str(
-                int(Decimal(TOKENS_TO_FOLLOW_VOTING) * Decimal(1e18))
-            )
-
-    # Dump back to tokens_distribution_for_msig.json
-    with open(
-        f"{get_root_dir()}/output/{FILE_PREFIX}_{start_date.date()}_{end_date.date()}.json",
-        "w",
-    ) as _f:
-        json.dump(output_data, _f, indent=4)
-    return output_data
-
-
 def run_stip_pipeline(end_date: int) -> None:
     """
     Main function to execute STIP calculations
@@ -326,8 +289,13 @@ def run_stip_pipeline(end_date: int) -> None:
                 pool_protocol_fees.get(gauge_addr, 0) / dollar_value_of_bal_emitted,
                 DYNAMIC_BOOST_CAP,
             )
+            print(
+                f"Gauge {gauge_addr} has a fees of {pool_protocol_fees.get(gauge_addr, 0)} and earned {dollar_value_of_bal_emitted} in USD BAL rendering a raw dynamic boost of {dynamic_boost}"
+            )
         else:
-            dynamic_boost = 0
+            dynamic_boost = 1.0
+        if dynamic_boost < 1:
+            dynamic_boost = 1.0
         dynamic_boosts[gauge_addr] = dynamic_boost
 
         # Now calculate the final boost value, which uses formula - (dynamic boost + fixed boost) - 1
@@ -379,19 +347,19 @@ def run_stip_pipeline(end_date: int) -> None:
         mainnet_root_gauge_contract = web3_mainnet.eth.contract(
             address=Web3.to_checksum_address(gauge_addr), abi=get_abi("ArbRootGauge")
         )
+        to_distribute = min(to_distribute, max_tokens_per_gauge[gauge_addr])
         gauge_distributions[gauge_addr] = {
             "recipientGaugeAddr": mainnet_root_gauge_contract.functions.getRecipient().call(),
             "poolAddress": gauge_data["poolAddress"],
             "symbol": gauge_data["symbol"],
-            "voteWeight": gauge_data["voteWeight"],
-            "voteWeightNoBoost": gauge_data["weightNoBoost"],
-            "distribution": to_distribute
-            if to_distribute < max_tokens_per_gauge[gauge_addr]
-            else max_tokens_per_gauge[gauge_addr],
+            "distribution": to_distribute,
             "pctDistribution": to_distribute / TOTAL_TOKENS_PER_EPOCH * 100,
-            "boost": combined_boost.get(gauge_addr, 1),
+            "distroToBalancer": to_distribute * pct_to_bal,
+            "voteWeightNoBoost": gauge_data["weightNoBoost"],
             "staticBoost": boost_data.get(gauges[gauge_addr]["id"], 1),
             "dynamicBoost": dynamic_boosts.get(gauge_addr, 1),
+            "boost": combined_boost.get(gauge_addr, 1),
+            "voteWeight": gauge_data["voteWeight"],
             "cap": f"{percent_vote_caps_per_gauge[gauge_addr]}%",
             "fixedIncentive": fixed_emissions_per_pool[gauge_data["id"]],
         }
@@ -424,4 +392,6 @@ def run_stip_pipeline(end_date: int) -> None:
         index=False,
     )
 
-    generate_and_save_transaction(gauge_distributions, start_date, end_date)
+    bal_tx = generate_and_save_bal_injector_transaction(
+        gauge_distributions, start_date, end_date
+    )

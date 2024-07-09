@@ -8,6 +8,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Union
+from bal_tools import Subgraph
 
 from gql import Client
 from gql import gql
@@ -16,19 +17,17 @@ from web3 import Web3
 from web3.exceptions import BadFunctionCallOutput
 
 BAL_GQL_URL = "https://api-v3.balancer.fi/"
-
-BLOCKS_GQL_URL_ARB = (
-    "https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-one-blocks"
-)
-
-BLOCKS_BY_CHAIN = {
-    "mainnet": "https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks",
-    "arbitrum": "https://api.thegraph.com/subgraphs/name/ianlapham/arbitrum-one-blocks",
-    "polygon": "https://api.thegraph.com/subgraphs/name/ianlapham/polygon-blocks",
-    "base": "https://api.studio.thegraph.com/query/48427/bleu-base-blocks/version/latest",
-    "gnosis": "https://api.thegraph.com/subgraphs/name/rebase-agency/gnosis-chain-blocks",
-    "avalanche": "https://api.thegraph.com/subgraphs/name/iliaazhel/avalanche-blocks",
-}
+CHAINS = [
+    "mainnet",
+    "arbitrum",
+    "polygon",
+    "base",
+    "gnosis",
+    "avalanche",
+]
+BLOCKS_BY_CHAIN = {}
+for chain in CHAINS:
+    BLOCKS_BY_CHAIN[chain] = Subgraph(chain).get_subgraph_url("blocks")
 
 VE_BAL_CONTRACT = "0xC128a9954e6c874eA3d62ce62B468bA073093F25"
 AURA_VEBAL_HOLDER = "0xaF52695E1bB01A16D33D7194C28C42b10e0Dbec2"
