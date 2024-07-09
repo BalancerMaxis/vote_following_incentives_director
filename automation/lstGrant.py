@@ -168,6 +168,7 @@ def recur_distribute_unspend_tokens(
             print(
                 f"WARNING: Was not able to get all tokens under the cap due to a lack of capacity. Double check that final distributions are sensible"
             )
+            return
         # Iterate over uncapped gauges and distribute unspent tokens
         # proportionally to their voting weight which is total uncapped weight
         for a, uncap_gauge in {
@@ -354,7 +355,7 @@ def run_stip_pipeline(end_date: int) -> None:
             "symbol": gauge_data["symbol"],
             "distribution": to_distribute,
             "pctDistribution": to_distribute / TOTAL_TOKENS_PER_EPOCH * 100,
-            "distroToBalancer": to_distribute * pct_to_bal,
+            "distroToBalancer": to_distribute,
             "voteWeightNoBoost": gauge_data["weightNoBoost"],
             "staticBoost": boost_data.get(gauges[gauge_addr]["id"], 1),
             "dynamicBoost": dynamic_boosts.get(gauge_addr, 1),
