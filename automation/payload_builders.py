@@ -89,8 +89,8 @@ def generate_and_save_bal_injector_transaction(
 
     # Find transaction with func name `setRecipientList` and dump gauge
     gauge_distributions = tokens_gauge_distributions.values()
-    tx_template = output_data["transactions"][1]
-    transfer_tx = output_data["transactions"][2]
+    tx_template = output_data["transactions"][0]
+    transfer_tx = output_data["transactions"][1]
     tx_list = []
     gauges_list = []
     amounts_list = []
